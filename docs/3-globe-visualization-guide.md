@@ -40,6 +40,7 @@
 ### Step 1: Basic 3D Globe Setup (30 minutes)
 
 **Prompt to Claude:**
+
 ```
 Create an interactive 3D Earth globe using Three.js and Globe.gl:
 
@@ -76,6 +77,7 @@ Provide clean code with comments explaining the 3D concepts.
 ### Step 2: Add Earthquake Data (45 minutes)
 
 **Prompt to Claude:**
+
 ```
 Add real earthquake data visualization to the globe:
 
@@ -123,6 +125,7 @@ Make the visualization both scientific and beautiful.
 ### Step 3: Add Multiple Dataset Support (60 minutes)
 
 **Prompt to Claude:**
+
 ```
 Add support for multiple global datasets beyond earthquakes:
 
@@ -171,6 +174,7 @@ Handle API failures gracefully with error messages.
 ### Step 4: Add Time-Based Playback (45 minutes)
 
 **Prompt to Claude:**
+
 ```
 Add time-based animation to show how data changes over time:
 
@@ -212,6 +216,7 @@ Make the time visualization smooth and educational - like a time-lapse documenta
 ### Step 5: Add Info Panels & Statistics (30 minutes)
 
 **Prompt to Claude:**
+
 ```
 Add comprehensive information panels and statistics:
 
@@ -253,6 +258,7 @@ Make it information-rich but not cluttered - clean, modern design.
 ### Step 6: Add Custom Data Upload (30 minutes)
 
 **Prompt to Claude:**
+
 ```
 Allow users to upload and visualize their own geographic datasets:
 
@@ -301,6 +307,7 @@ Make it easy enough that a teacher could use it in class.
 ### Step 7: Polish & Advanced Features (45 minutes)
 
 **Prompt to Claude:**
+
 ```
 Final polish and advanced features for demo-ready globe:
 
@@ -353,11 +360,13 @@ Make it production-quality and bulletproof for live demo.
 ### Free APIs (No Key Required)
 
 **Earthquakes:**
+
 ```
 https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson
 ```
 
 **All Earthquakes M2.5+ (30 days):**
+
 ```
 https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_month.geojson
 ```
@@ -365,18 +374,21 @@ https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_month.geojson
 ### Free APIs (Key Required - Free Tier)
 
 **Flight Data (OpenSky Network):**
+
 ```
 https://opensky-network.org/api/states/all
 Free tier: 400 credits/day, no commercial use
 ```
 
 **COVID-19 Data (disease.sh):**
+
 ```
 https://disease.sh/v3/covid-19/countries
 No key needed, updates daily
 ```
 
 **NASA FIRMS (Wildfires):**
+
 ```
 https://firms.modaps.eosdis.nasa.gov/api/area/
 Requires free API key from NASA
@@ -385,9 +397,11 @@ Requires free API key from NASA
 ### Static Datasets
 
 **World Cities:**
+
 - SimpleMaps: https://simplemaps.com/data/world-cities (free basic dataset)
 
 **Historical Events:**
+
 - Curate your own CSV from public datasets
 
 ---
@@ -397,6 +411,7 @@ Requires free API key from NASA
 Create these CSV files to show variety:
 
 **battles.csv** (Historical battles)
+
 ```csv
 latitude,longitude,name,year,casualties
 50.8503,4.3517,Battle of Waterloo,1815,50000
@@ -405,6 +420,7 @@ latitude,longitude,name,year,casualties
 ```
 
 **unesco-sites.csv** (World Heritage Sites)
+
 ```csv
 latitude,longitude,name,country,year_inscribed
 27.1751,78.0421,Taj Mahal,India,1983
@@ -413,6 +429,7 @@ latitude,longitude,name,country,year_inscribed
 ```
 
 **meteor-impacts.csv** (Meteor impact craters)
+
 ```csv
 latitude,longitude,name,diameter_km,age_million_years
 35.0,-111.0,Barringer Crater,1.2,0.05
@@ -424,6 +441,7 @@ latitude,longitude,name,diameter_km,age_million_years
 ## Deployment
 
 ### GitHub Pages (Recommended)
+
 ```bash
 git init
 git add .
@@ -436,6 +454,7 @@ git push -u origin main
 ```
 
 ### Performance Considerations
+
 - Compress texture images
 - Use CDN for Three.js library
 - Lazy-load datasets
@@ -448,6 +467,7 @@ git push -u origin main
 Before the event:
 
 **Functionality:**
+
 - [ ] Globe renders and rotates smoothly
 - [ ] All datasets load correctly
 - [ ] Earthquake data is current (last 30 days)
@@ -456,18 +476,21 @@ Before the event:
 - [ ] Time-based playback animates smoothly
 
 **Performance:**
+
 - [ ] Runs at 60fps when idle
 - [ ] Runs at 30fps+ with 1000+ points
 - [ ] No memory leaks over 15 minutes
 - [ ] Responsive on zoom in/out
 
 **Data:**
+
 - [ ] API calls succeed (test with network inspector)
 - [ ] Error handling shows user-friendly messages
 - [ ] Backup data available if API fails
 - [ ] Last updated timestamp is accurate
 
 **UI:**
+
 - [ ] All buttons and controls work
 - [ ] Panels slide smoothly
 - [ ] Dataset switcher changes visualization
@@ -475,6 +498,7 @@ Before the event:
 - [ ] File upload accepts valid CSV
 
 **Compatibility:**
+
 - [ ] Works in Chrome, Firefox, Safari
 - [ ] Works on tablet (touch controls)
 - [ ] Degrades gracefully on older devices
@@ -485,6 +509,7 @@ Before the event:
 ## Demo Presentation Script
 
 ### Setup (Before Demo)
+
 - Load globe with earthquake dataset
 - Position camera showing interesting cluster (e.g., Pacific Ring of Fire)
 - Have auto-rotation enabled
@@ -515,6 +540,7 @@ Before the event:
 "This type of 3D data visualization is what news organizations like NYTimes or BBC use for data journalism stories. Research labs use it for scientific data."
 
 "I built this in about 4 hours with AI assistance. Normally, professional 3D data visualization takes 1-2 weeks minimum because you need expertise in:"
+
 - 3D graphics programming (Three.js, WebGL)
 - Geographic projections and coordinate systems
 - Data processing and API integration
@@ -551,21 +577,25 @@ A: "Absolutely. Scientists use visualizations like this to identify patterns - l
 ### Advanced Features
 
 **Real-time Collaboration:**
+
 - Multiple users viewing same globe
 - Shared annotations
 - Chat panel for discussing data
 
 **AR/VR Mode:**
+
 - View globe in augmented reality (phone camera)
 - VR headset support for immersive view
 - Hand tracking for gesture controls
 
 **Machine Learning Integration:**
+
 - Predict next earthquake locations
 - Cluster analysis of patterns
 - Anomaly detection visualization
 
 **Educational Mode:**
+
 - Guided tours ("Let me show you the Ring of Fire...")
 - Quiz mode (find the country, identify the dataset)
 - Lesson plans for teachers
@@ -575,21 +605,25 @@ A: "Absolutely. Scientists use visualizations like this to identify patterns - l
 ## Resources
 
 ### Libraries
+
 - **Globe.gl:** https://globe.gl/ (3D globe specifically for data viz)
 - **Three.js:** https://threejs.org/ (3D graphics framework)
 - **Cesium:** https://cesium.com/ (Alternative, more advanced)
 
 ### Data Sources
+
 - **USGS Earthquakes:** https://earthquake.usgs.gov/earthquakes/feed/
 - **OpenSky Network:** https://opensky-network.org/
 - **Natural Earth Data:** https://www.naturalearthdata.com/ (geographic datasets)
 - **Our World in Data:** https://ourworldindata.org/ (various global datasets)
 
 ### Textures
+
 - **NASA Visible Earth:** https://visibleearth.nasa.gov/
 - **Solar System Scope:** https://www.solarsystemscope.com/textures/ (planet textures)
 
 ### Learning
+
 - **Three.js Journey:** https://threejs-journey.com/
 - **WebGL Fundamentals:** https://webglfundamentals.org/
 

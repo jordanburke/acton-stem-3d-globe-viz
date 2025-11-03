@@ -10,7 +10,7 @@ export default defineConfig({
     globals: true,
 
     // Environment setup
-    environment: "node",
+    environment: "happy-dom",
 
     // Include patterns
     include: ["**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],

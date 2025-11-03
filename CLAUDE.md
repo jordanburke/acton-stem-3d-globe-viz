@@ -102,10 +102,12 @@ This is a **3D Interactive Globe Data Visualization** project for an ACTON STEM 
 ### Key Data Sources
 
 **Free APIs (No Key)**:
+
 - USGS Earthquakes: `https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson`
 - COVID-19: `https://disease.sh/v3/covid-19/countries`
 
 **Free APIs (Key Required)**:
+
 - OpenSky Network: Flight data (400 credits/day free tier)
 - NASA FIRMS: Wildfire data (free API key)
 
@@ -125,6 +127,7 @@ This repository currently contains the TypeScript library template structure. To
 ## Deployment Strategy
 
 **Recommended**: GitHub Pages for simple static hosting
+
 - Fast CDN delivery
 - Easy updates via git push
 - Custom domain support
