@@ -47,7 +47,7 @@ export class GlobeRenderer {
       .pointsData(points)
       .pointAltitude("size")
       .pointColor("color")
-      .pointRadius(0.5)
+      .pointRadius(1.0) // Increased from 0.5 to 1.0 for better visibility
       .pointLabel((d) => {
         const point = d as GlobePoint
         return point.label

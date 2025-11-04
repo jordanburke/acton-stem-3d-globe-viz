@@ -33,7 +33,8 @@ function getMagnitudeColor(magnitude: number): string {
  */
 function getMagnitudeSize(magnitude: number): number {
   // Scale exponentially to make larger earthquakes more visible
-  return Math.pow(magnitude, 1.5) * 0.003
+  // Increased multiplier from 0.003 to 0.015 for better visibility (5x larger)
+  return Math.pow(magnitude, 1.5) * 0.015
 }
 
 /**
@@ -48,11 +49,14 @@ function formatTime(timestamp: number): string {
  */
 function createEarthquakeLabel(feature: EarthquakeFeature): string {
   const props = feature.properties
+  const magnitude = props.mag !== null ? props.mag.toFixed(1) : "N/A"
+  const depth = feature.geometry.coordinates[2] !== null ? feature.geometry.coordinates[2].toFixed(1) : "N/A"
+
   return `
     <div class="tooltip-title">${props.title}</div>
     <div class="tooltip-content">
-      <strong>Magnitude:</strong> ${props.mag.toFixed(1)}<br/>
-      <strong>Depth:</strong> ${feature.geometry.coordinates[2].toFixed(1)} km<br/>
+      <strong>Magnitude:</strong> ${magnitude}<br/>
+      <strong>Depth:</strong> ${depth} km<br/>
       <strong>Time:</strong> ${formatTime(props.time)}<br/>
       <strong>Location:</strong> ${props.place}
       ${props.tsunami ? '<br/><strong style="color: #ff5252;">⚠️ Tsunami Warning</strong>' : ""}
@@ -64,19 +68,21 @@ function createEarthquakeLabel(feature: EarthquakeFeature): string {
  * Converts earthquake GeoJSON features to globe points
  */
 export function convertEarthquakesToPoints(data: EarthquakeData): GlobePoint[] {
-  return data.features.map((feature) => {
-    const [lng, lat, depth] = feature.geometry.coordinates
-    const magnitude = feature.properties.mag
+  return data.features
+    .filter((feature) => feature.properties.mag !== null) // Filter out earthquakes with null magnitude
+    .map((feature) => {
+      const [lng, lat, depth] = feature.geometry.coordinates
+      const magnitude = feature.properties.mag
 
-    return {
-      lat,
-      lng,
-      size: getMagnitudeSize(magnitude),
-      color: getMagnitudeColor(magnitude),
-      label: createEarthquakeLabel(feature),
-      data: feature,
-    }
-  })
+      return {
+        lat,
+        lng,
+        size: getMagnitudeSize(magnitude),
+        color: getMagnitudeColor(magnitude),
+        label: createEarthquakeLabel(feature),
+        data: feature,
+      }
+    })
 }
 
 /**
