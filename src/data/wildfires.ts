@@ -5,9 +5,19 @@ import type { GlobePoint } from "./types"
 // Using VIIRS_SNPP_NRT sensor (375m resolution) for global coverage
 // Replace with your actual API key or set VITE_NASA_FIRMS_API_KEY environment variable
 const NASA_FIRMS_API_KEY = import.meta.env.VITE_NASA_FIRMS_API_KEY || ""
-const NASA_FIRMS_URL = NASA_FIRMS_API_KEY
-  ? `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${NASA_FIRMS_API_KEY}/VIIRS_SNPP_NRT/world/1/2024-11-04`
-  : ""
+
+/**
+ * Gets the NASA FIRMS API URL for the last 24 hours
+ * Format: /api/area/csv/{API_KEY}/{source}/world/{day_range}/{date}
+ */
+function getFirmsURL(): string {
+  if (!NASA_FIRMS_API_KEY) return ""
+
+  // Get today's date in YYYY-MM-DD format
+  const today = new Date().toISOString().split("T")[0]
+
+  return `https://firms.modaps.eosdis.nasa.gov/api/area/csv/${NASA_FIRMS_API_KEY}/VIIRS_SNPP_NRT/world/1/${today}`
+}
 
 // Sample wildfire data for demo purposes (when API key is not available)
 const SAMPLE_WILDFIRE_DATA: WildfireData[] = [
@@ -109,15 +119,17 @@ interface WildfireData {
  * Falls back to sample data if API key is not configured
  */
 export async function fetchWildfireData(): Promise<WildfireData[]> {
+  const firmsURL = getFirmsURL()
+
   // Use sample data if no API key is configured
-  if (!NASA_FIRMS_URL) {
+  if (!firmsURL) {
     console.warn(
       "NASA FIRMS API key not configured. Using sample data. Get your free API key at: https://firms.modaps.eosdis.nasa.gov/api/area/",
     )
     return Promise.resolve(SAMPLE_WILDFIRE_DATA)
   }
 
-  const response = await fetch(NASA_FIRMS_URL)
+  const response = await fetch(firmsURL)
 
   if (!response.ok) {
     throw new Error(`Failed to fetch wildfire data: ${response.statusText}`)
