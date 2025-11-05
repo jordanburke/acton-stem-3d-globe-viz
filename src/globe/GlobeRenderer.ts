@@ -16,7 +16,7 @@ export class GlobeRenderer {
   }
 
   private initializeGlobe(): void {
-    this.globe = Globe()(this.container)
+    this.globe = new Globe()(this.container)
       .globeImageUrl("https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg")
       .bumpImageUrl("https://unpkg.com/three-globe/example/img/earth-topology.png")
       .backgroundImageUrl("https://unpkg.com/three-globe/example/img/night-sky.png")
@@ -28,7 +28,7 @@ export class GlobeRenderer {
 
     // Enable rotation
     this.globe.controls().autoRotate = true
-    this.globe.controls().autoRotateSpeed = 0.5
+    this.globe.controls().autoRotateSpeed = 0.1
 
     // Handle window resize
     window.addEventListener("resize", this.handleResize.bind(this))
@@ -48,7 +48,7 @@ export class GlobeRenderer {
       .pointsData(points)
       .pointAltitude("size")
       .pointColor("color")
-      .pointRadius(1.0)
+      .pointRadius(0.08)
       .pointLabel((d) => {
         const point = d as GlobePoint
         return point.label
