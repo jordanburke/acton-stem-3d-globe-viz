@@ -35,12 +35,12 @@
     "ts-types": "tsc"
   },
   "dependencies": {
-    "@mantine/core": "^7.17.8",
+    "@mantine/core": "^8.3.6",
     "@mantine/hooks": "^7.17.8",
     "globe.gl": "^2.45.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "three": "^0.170.0"
+    "three": "^0.181.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
@@ -48,7 +48,7 @@
     "@types/node": "^22.19.0",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
-    "@types/three": "^0.170.0",
+    "@types/three": "^0.181.0",
     "@typescript-eslint/eslint-plugin": "^8.46.3",
     "@typescript-eslint/parser": "^8.46.3",
     "@vitejs/plugin-react": "^4.7.0",
