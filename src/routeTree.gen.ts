@@ -10,23 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as MoleculesRouteImport } from './routes/molecules'
-import { Route as DashboardRouteImport } from './routes/dashboard'
-import { Route as AutoCycleRouteImport } from './routes/auto-cycle'
 import { Route as IndexRouteImport } from './routes/index'
 
 const MoleculesRoute = MoleculesRouteImport.update({
   id: '/molecules',
   path: '/molecules',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AutoCycleRoute = AutoCycleRouteImport.update({
-  id: '/auto-cycle',
-  path: '/auto-cycle',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -37,35 +25,27 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/auto-cycle': typeof AutoCycleRoute
-  '/dashboard': typeof DashboardRoute
   '/molecules': typeof MoleculesRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/auto-cycle': typeof AutoCycleRoute
-  '/dashboard': typeof DashboardRoute
   '/molecules': typeof MoleculesRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/auto-cycle': typeof AutoCycleRoute
-  '/dashboard': typeof DashboardRoute
   '/molecules': typeof MoleculesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auto-cycle' | '/dashboard' | '/molecules'
+  fullPaths: '/' | '/molecules'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auto-cycle' | '/dashboard' | '/molecules'
-  id: '__root__' | '/' | '/auto-cycle' | '/dashboard' | '/molecules'
+  to: '/' | '/molecules'
+  id: '__root__' | '/' | '/molecules'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AutoCycleRoute: typeof AutoCycleRoute
-  DashboardRoute: typeof DashboardRoute
   MoleculesRoute: typeof MoleculesRoute
 }
 
@@ -76,20 +56,6 @@ declare module '@tanstack/react-router' {
       path: '/molecules'
       fullPath: '/molecules'
       preLoaderRoute: typeof MoleculesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auto-cycle': {
-      id: '/auto-cycle'
-      path: '/auto-cycle'
-      fullPath: '/auto-cycle'
-      preLoaderRoute: typeof AutoCycleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -104,8 +70,6 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AutoCycleRoute: AutoCycleRoute,
-  DashboardRoute: DashboardRoute,
   MoleculesRoute: MoleculesRoute,
 }
 export const routeTree = rootRouteImport

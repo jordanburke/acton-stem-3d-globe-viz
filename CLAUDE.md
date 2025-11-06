@@ -14,8 +14,9 @@ This is a **multi-demo educational exhibit** for DiscoverSTEM 2025 showcasing AI
 2. **Molecule Viewer** - 3D molecular structure visualization with four molecules:
    - Water (H2O), Carbon Dioxide (CO2), DNA double helix, Hemoglobin protein
 
-3. **Auto-Cycle Mode** - Automatic presentation cycling through all 7 visualizations:
-   - Prefetches async data for seamless transitions
+3. **Auto-Cycle Mode** - Automatic presentation mode with overlay controls:
+   - Navigates through actual routes preserving all UI elements
+   - URL-based navigation using search parameters
    - Configurable duration (5-30 seconds per view)
    - Full playback controls and keyboard shortcuts
 
@@ -56,25 +57,29 @@ This is a **multi-demo educational exhibit** for DiscoverSTEM 2025 showcasing AI
 
 **Multi-Route Application** using TanStack Router (file-based routing):
 
-- `/` (index.tsx) - 3D Globe visualization demo
-- `/molecules` - Molecule viewer demo
-- `/auto-cycle` - Auto-cycle mode (automatic presentation)
-- `/dashboard` - Dashboard (placeholder)
-- `__root.tsx` - Root layout with AppShell and tab navigation
+- `/` (index.tsx) - 3D Globe visualization demo with URL search param support (`?dataset=mountains|earthquakes|wildfires`)
+- `/molecules` - Molecule viewer demo with URL search param support (`?molecule=water|glucose|dna|hemoglobin`)
+- `__root.tsx` - Root layout with AppShell, tab navigation, AutoCycleProvider context, and AutoCycleOverlay
 
 **Key Components**:
 
 - Globe visualization (`src/components/Globe.tsx`) - Wrapper for GlobeRenderer
 - GlobeRenderer (`src/globe/GlobeRenderer.ts`) - Core Globe.gl integration class
 - MoleculeViewer (`src/components/MoleculeViewer.tsx`) - React Three Fiber 3D molecules
+- AutoCycleToggle (`src/components/AutoCycleToggle.tsx`) - Header toggle button for auto-cycle mode
+- AutoCycleOverlay (`src/components/AutoCycleOverlay.tsx`) - Overlay with navigation logic and keyboard shortcuts
 - AutoCycleControls (`src/components/AutoCycleControls.tsx`) - Playback controls for auto-cycle
 - ControlsPanel, InfoPanel - Reusable UI controls for globe demo
 - MoleculeSelector, MoleculeInfo, AtomLegend - Molecule demo UI
 - ErrorBoundary (`src/components/ErrorBoundary.tsx`) - App-level error handling
 
+**Contexts**:
+
+- AutoCycleContext (`src/contexts/AutoCycleContext.tsx`) - Global auto-cycle toggle state
+
 **Custom Hooks**:
 
-- useAutoCycle (`src/hooks/useAutoCycle.ts`) - Auto-cycle state management and timer logic
+- useAutoCycle (`src/hooks/useAutoCycle.ts`) - Auto-cycle timer management with phase change callbacks
 
 ### Data Layer Architecture
 
@@ -140,6 +145,64 @@ Each dataset module (`src/data/*.ts`) exports three functions:
 - Auto-generated route tree at build time (`routeTree.gen.ts`)
 - Router devtools included (dev mode only)
 - Routes registered in `main.tsx` with type safety
+
+### Auto-Cycle Architecture
+
+**Design Philosophy**: The auto-cycle mode navigates through actual routes instead of being a standalone route. This preserves all route-specific UI elements (InfoPanel, ControlsPanel, MoleculeSelector) while adding presentation mode capability.
+
+**Five-Layer Architecture**:
+
+1. **AutoCycleContext** (`src/contexts/AutoCycleContext.tsx`) - Global React context
+   - State: `isEnabled: boolean`
+   - Methods: `enable()`, `disable()`, `toggle()`
+   - Provider wraps entire app in `__root.tsx`
+
+2. **AutoCycleToggle** (`src/components/AutoCycleToggle.tsx`) - Header button
+   - Icon toggle: Presentation icon (off) ↔ PresentationOff icon (on)
+   - Calls `toggle()` from context
+   - Cyan accent color when enabled
+
+3. **AutoCycleOverlay** (`src/components/AutoCycleOverlay.tsx`) - Conditional overlay
+   - Renders only when `isEnabled === true`
+   - Semi-transparent backdrop with blur effect
+   - Manages `useAutoCycle` hook with `onPhaseChange` callback
+   - Handles keyboard shortcuts (Space, Arrows, Escape)
+   - Displays AutoCycleControls panel
+
+4. **useAutoCycle Hook** (`src/hooks/useAutoCycle.ts`) - Core timer logic
+   - State management: `currentPhase` (globe|molecule), indices, duration, progress
+   - Timer intervals: Main cycle timer + progress bar updater (100ms)
+   - Controls: `play()`, `pause()`, `skipForward()`, `skipBackward()`, `setDuration()`
+   - Callback: `onPhaseChange(phase, index)` fires when advancing/going back
+   - Cycle order: 3 globe datasets (mountains→earthquakes→wildfires) → 4 molecules (water→glucose→dna→hemoglobin)
+
+5. **URL Search Parameters** - Route state interface
+   - Globe route: `/?dataset=mountains|earthquakes|wildfires`
+   - Molecules route: `/molecules?molecule=water|glucose|dna|hemoglobin`
+   - Routes listen for search param changes via `useEffect`
+   - Auto-cycle navigates with `navigate({ to: path, search: { param: value } })`
+
+**Navigation Flow**:
+
+1. User clicks AutoCycleToggle → `enable()` → `isEnabled = true`
+2. AutoCycleOverlay renders → starts `useAutoCycle` hook
+3. Timer advances → `onPhaseChange(phase, index)` callback fires
+4. Overlay calls `navigate()` with appropriate route + search params
+5. Route's `useEffect` sees search param change → updates local state
+6. Route renders with new dataset/molecule (all UI preserved)
+
+**Keyboard Shortcuts** (AutoCycleOverlay.tsx:29-54):
+
+- `Escape` - Exit auto-cycle mode (calls `disable()`)
+- `Space` - Toggle play/pause
+- `ArrowLeft` - Skip backward to previous visualization
+- `ArrowRight` - Skip forward to next visualization
+
+**Memory Management**:
+
+- Timer intervals cleaned up in `useEffect` cleanup functions
+- Event listeners properly removed on unmount
+- Bound function references stored for correct cleanup (GlobeRenderer.ts:44)
 
 ## External Data Sources
 
@@ -276,6 +339,25 @@ VITE_NASA_FIRMS_API_KEY=your_api_key_here
 ### Adding New Routes
 
 1. Create `src/routes/[name].tsx` with component and `createFileRoute`
-2. TanStack Router plugin auto-generates route in `routeTree.gen.ts`
-3. Add tab to `__root.tsx` AppShell header Tabs component
-4. Router automatically handles navigation and type safety
+2. Add URL search param support if route should be auto-cycle compatible:
+   ```typescript
+   export const Route = createFileRoute("/[name]")({
+     validateSearch: (search: Record<string, unknown>) => ({
+       param: (search.param as string) || undefined,
+     }),
+     component: YourComponent,
+   })
+   ```
+3. In component, sync URL search params with local state:
+   ```typescript
+   const searchParams = Route.useSearch()
+   useEffect(() => {
+     if (searchParams.param && searchParams.param !== localState) {
+       setLocalState(searchParams.param)
+     }
+   }, [searchParams.param])
+   ```
+4. TanStack Router plugin auto-generates route in `routeTree.gen.ts`
+5. Add tab to `__root.tsx` AppShell header Tabs component
+6. Update `useAutoCycle` arrays if route should be included in auto-cycle
+7. Router automatically handles navigation and type safety

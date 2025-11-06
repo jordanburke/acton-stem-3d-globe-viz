@@ -129,6 +129,7 @@ export async function fetchWildfireData(): Promise<WildfireData[]> {
     return Promise.resolve(SAMPLE_WILDFIRE_DATA)
   }
 
+  console.log("Fetching wildfire data from:", firmsURL)
   const response = await fetch(firmsURL)
 
   if (!response.ok) {
@@ -136,7 +137,9 @@ export async function fetchWildfireData(): Promise<WildfireData[]> {
   }
 
   const csvText = await response.text()
-  return parseCSV(csvText)
+  const data = parseCSV(csvText)
+  console.log(`Loaded ${data.length} wildfire data points`)
+  return data
 }
 
 /**
@@ -173,14 +176,15 @@ function parseCSV(csvText: string): WildfireData[] {
 
 /**
  * Gets color based on fire radiative power (FRP)
+ * Uses yellow → orange → red spectrum only
  */
 function getFireColor(frp: number): string {
-  if (frp >= 1000) return "#ff0000" // Bright red - Extreme fire
-  if (frp >= 500) return "#ff4500" // Orange red - Very high intensity
-  if (frp >= 100) return "#ff8c00" // Dark orange - High intensity
-  if (frp >= 50) return "#ffa500" // Orange - Moderate intensity
-  if (frp >= 10) return "#ffb347" // Light orange - Low intensity
-  return "#ffd700" // Gold - Very low intensity
+  if (frp >= 1000) return "#ff0000" // Red - Extreme fire
+  if (frp >= 500) return "#ff2200" // Red-orange - Very high intensity
+  if (frp >= 100) return "#ff4400" // Orange-red - High intensity
+  if (frp >= 50) return "#ff6600" // Orange - Moderate intensity
+  if (frp >= 10) return "#ff8800" // Light orange - Low intensity
+  return "#ffaa00" // Yellow-orange - Very low intensity
 }
 
 /**

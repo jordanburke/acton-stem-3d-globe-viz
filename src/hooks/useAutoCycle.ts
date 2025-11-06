@@ -20,10 +20,16 @@ export interface AutoCycleControls {
   setDuration: (duration: number) => void
 }
 
+export interface AutoCycleOptions {
+  initialDuration?: number
+  onPhaseChange?: (phase: CyclePhase, index: number) => void
+}
+
 const GLOBE_DATASETS = ["mountains", "earthquakes", "wildfires"] as const
 const MOLECULE_IDS = ["water", "glucose", "dna", "hemoglobin"] as const
 
-export function useAutoCycle(initialDuration: number = 10000): AutoCycleControls {
+export function useAutoCycle(options: AutoCycleOptions = {}): AutoCycleControls {
+  const { initialDuration = 10000, onPhaseChange } = options
   const [state, setState] = useState<AutoCycleState>({
     isRunning: true,
     currentPhase: "globe",
@@ -39,36 +45,46 @@ export function useAutoCycle(initialDuration: number = 10000): AutoCycleControls
 
   const advance = (): void => {
     setState((prev) => {
+      let newState: AutoCycleState
       if (prev.currentPhase === "globe") {
         if (prev.globeIndex < GLOBE_DATASETS.length - 1) {
           // Move to next globe dataset
-          return { ...prev, globeIndex: prev.globeIndex + 1, progress: 0 }
+          newState = { ...prev, globeIndex: prev.globeIndex + 1, progress: 0 }
         } else {
           // Switch to molecule phase
-          return { ...prev, currentPhase: "molecule", moleculeIndex: 0, progress: 0 }
+          newState = { ...prev, currentPhase: "molecule", moleculeIndex: 0, progress: 0 }
         }
       } else {
         if (prev.moleculeIndex < MOLECULE_IDS.length - 1) {
           // Move to next molecule
-          return { ...prev, moleculeIndex: prev.moleculeIndex + 1, progress: 0 }
+          newState = { ...prev, moleculeIndex: prev.moleculeIndex + 1, progress: 0 }
         } else {
           // Cycle back to globe phase
-          return { ...prev, currentPhase: "globe", globeIndex: 0, progress: 0 }
+          newState = { ...prev, currentPhase: "globe", globeIndex: 0, progress: 0 }
         }
       }
+
+      // Trigger callback with new phase/index
+      if (onPhaseChange) {
+        const index = newState.currentPhase === "globe" ? newState.globeIndex : newState.moleculeIndex
+        onPhaseChange(newState.currentPhase, index)
+      }
+
+      return newState
     })
     startTimeRef.current = Date.now()
   }
 
   const goBack = (): void => {
     setState((prev) => {
+      let newState: AutoCycleState
       if (prev.currentPhase === "globe") {
         if (prev.globeIndex > 0) {
           // Move to previous globe dataset
-          return { ...prev, globeIndex: prev.globeIndex - 1, progress: 0 }
+          newState = { ...prev, globeIndex: prev.globeIndex - 1, progress: 0 }
         } else {
           // Switch to last molecule
-          return {
+          newState = {
             ...prev,
             currentPhase: "molecule",
             moleculeIndex: MOLECULE_IDS.length - 1,
@@ -78,10 +94,10 @@ export function useAutoCycle(initialDuration: number = 10000): AutoCycleControls
       } else {
         if (prev.moleculeIndex > 0) {
           // Move to previous molecule
-          return { ...prev, moleculeIndex: prev.moleculeIndex - 1, progress: 0 }
+          newState = { ...prev, moleculeIndex: prev.moleculeIndex - 1, progress: 0 }
         } else {
           // Go back to last globe dataset
-          return {
+          newState = {
             ...prev,
             currentPhase: "globe",
             globeIndex: GLOBE_DATASETS.length - 1,
@@ -89,6 +105,14 @@ export function useAutoCycle(initialDuration: number = 10000): AutoCycleControls
           }
         }
       }
+
+      // Trigger callback with new phase/index
+      if (onPhaseChange) {
+        const index = newState.currentPhase === "globe" ? newState.globeIndex : newState.moleculeIndex
+        onPhaseChange(newState.currentPhase, index)
+      }
+
+      return newState
     })
     startTimeRef.current = Date.now()
   }
@@ -128,6 +152,7 @@ export function useAutoCycle(initialDuration: number = 10000): AutoCycleControls
         }
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.isRunning, state.duration])
 
   // Progress bar updater (updates every 100ms)

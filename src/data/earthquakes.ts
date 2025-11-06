@@ -17,15 +17,16 @@ export async function fetchEarthquakeData(): Promise<EarthquakeData> {
 
 /**
  * Gets the color based on earthquake magnitude
+ * Uses cyan → blue → purple → magenta → red spectrum for seismic activity
  */
 function getMagnitudeColor(magnitude: number): string {
   if (magnitude >= 7.0) return "#d32f2f" // Dark red - Major
   if (magnitude >= 6.0) return "#f44336" // Red - Strong
-  if (magnitude >= 5.0) return "#ff9800" // Orange - Moderate
-  if (magnitude >= 4.0) return "#ffc107" // Amber - Light
-  if (magnitude >= 3.0) return "#ffeb3b" // Yellow - Minor
-  if (magnitude >= 2.0) return "#cddc39" // Lime - Very minor
-  return "#8bc34a" // Green - Micro
+  if (magnitude >= 5.0) return "#ff6b9d" // Hot pink - Moderate
+  if (magnitude >= 4.0) return "#ba68c8" // Purple - Light
+  if (magnitude >= 3.0) return "#7e57c2" // Deep purple - Minor
+  if (magnitude >= 2.0) return "#5c6bc0" // Indigo - Very minor
+  return "#42a5f5" // Blue - Micro
 }
 
 /**

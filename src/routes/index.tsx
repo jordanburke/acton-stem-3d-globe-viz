@@ -1,8 +1,9 @@
 import { LoadingOverlay } from "@mantine/core"
-import { createFileRoute } from "@tanstack/react-router"
+import { createFileRoute, useNavigate } from "@tanstack/react-router"
 import { useCallback, useEffect, useState } from "react"
 
 import { ControlsPanel } from "../components/ControlsPanel"
+import { DatasetLegend } from "../components/DatasetLegend"
 import { Globe } from "../components/Globe"
 import { InfoPanel } from "../components/InfoPanel"
 import { convertEarthquakesToPoints, fetchEarthquakeData, getEarthquakeStats } from "../data/earthquakes"
@@ -11,7 +12,9 @@ import type { GlobePoint } from "../data/types"
 import { convertWildfiresToPoints, fetchWildfireData, getWildfireStats } from "../data/wildfires"
 
 function GlobeDemo() {
-  const [dataset, setDataset] = useState<string>("mountains")
+  const navigate = useNavigate()
+  const searchParams = Route.useSearch()
+  const [dataset, setDataset] = useState<string>(searchParams.dataset || "mountains")
   const [rotationSpeed, setRotationSpeed] = useState<number>(0.5)
   const [points, setPoints] = useState<GlobePoint[]>([])
   const [loading, setLoading] = useState<boolean>(false)
@@ -74,8 +77,17 @@ function GlobeDemo() {
   const handleDatasetChange = (value: string | null) => {
     if (value) {
       setDataset(value)
+      navigate({ search: { dataset: value } })
     }
   }
+
+  // Update dataset when URL search param changes (for auto-cycle)
+  useEffect(() => {
+    if (searchParams.dataset && searchParams.dataset !== dataset) {
+      setDataset(searchParams.dataset)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams.dataset])
 
   // Auto-load data when dataset changes
   useEffect(() => {
@@ -87,6 +99,8 @@ function GlobeDemo() {
       <LoadingOverlay visible={loading} overlayProps={{ radius: "sm", blur: 2 }} />
 
       <Globe points={points} rotationSpeed={rotationSpeed} />
+
+      <DatasetLegend dataset={dataset} />
 
       <ControlsPanel
         dataset={dataset}
@@ -108,5 +122,8 @@ function GlobeDemo() {
 }
 
 export const Route = createFileRoute("/")({
+  validateSearch: (search: Record<string, unknown>) => ({
+    dataset: (search.dataset as string) || undefined,
+  }),
   component: GlobeDemo,
 })

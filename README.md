@@ -25,12 +25,18 @@ A multi-demo educational exhibit featuring two interactive 3D visualizations: an
 ### Auto-Cycle Mode (NEW!)
 
 - **Automatic Presentation**: Cycles through all 7 visualizations automatically
+- **Header Toggle**: Enable/disable via toggle button in the header (no separate route)
+- **Preserves Route UI**: Navigates through actual routes, keeping InfoPanel, ControlsPanel, and MoleculeSelector
+- **URL-Based Navigation**: Uses search params (`/?dataset=mountains`, `/molecules?molecule=water`)
 - **Configurable Duration**: 5-30 seconds per view (default: 10s)
 - **Playback Controls**: Play, pause, skip forward/backward
 - **Progress Indicator**: Visual progress bar showing time remaining
-- **Keyboard Shortcuts**: Space (play/pause), Arrow keys (skip)
-- **Data Prefetching**: Seamless transitions with cached data
-- **Cycle Order**: Mountains → Earthquakes → Wildfires → Water → CO2 → DNA → Hemoglobin
+- **Keyboard Shortcuts**:
+  - Space: Play/pause
+  - Arrow Left/Right: Skip backward/forward
+  - Escape: Exit auto-cycle mode
+- **Overlay Display**: Semi-transparent overlay with controls during presentation
+- **Cycle Order**: Mountains → Earthquakes → Wildfires → Water → Glucose → DNA → Hemoglobin
 
 ## Quick Start
 
@@ -141,10 +147,9 @@ The app will automatically use sample wildfire data (5 demo fires) if no API key
 ```
 src/
 ├── routes/                  # TanStack Router file-based routes
-│   ├── __root.tsx          # Root layout with AppShell and tabs
-│   ├── index.tsx           # Globe visualization (home route)
-│   ├── molecules.tsx       # Molecule viewer route
-│   └── dashboard.tsx       # Dashboard route (placeholder)
+│   ├── __root.tsx          # Root layout with AppShell, tabs, and auto-cycle context
+│   ├── index.tsx           # Globe visualization (home route with URL search params)
+│   └── molecules.tsx       # Molecule viewer route (with URL search params)
 ├── components/              # React components
 │   ├── Globe.tsx           # Globe wrapper component
 │   ├── ControlsPanel.tsx   # Dataset and rotation controls
@@ -152,7 +157,14 @@ src/
 │   ├── MoleculeViewer.tsx  # React Three Fiber molecule renderer
 │   ├── MoleculeSelector.tsx # Molecule selection UI
 │   ├── MoleculeInfo.tsx    # Molecule details panel
-│   └── AtomLegend.tsx      # Chemical element legend
+│   ├── AtomLegend.tsx      # Chemical element legend
+│   ├── AutoCycleToggle.tsx # Header toggle button for auto-cycle mode
+│   ├── AutoCycleOverlay.tsx # Auto-cycle overlay with navigation logic
+│   └── AutoCycleControls.tsx # Auto-cycle playback controls
+├── contexts/                # React contexts
+│   └── AutoCycleContext.tsx # Shared auto-cycle toggle state
+├── hooks/                   # Custom React hooks
+│   └── useAutoCycle.ts     # Auto-cycle timer and state management
 ├── data/                    # Data fetching and processing
 │   ├── earthquakes.ts      # USGS earthquake data
 │   ├── wildfires.ts        # NASA FIRMS wildfire data
@@ -202,10 +214,33 @@ src/
 - Firefox 88+
 - Safari 14+
 
+## Architecture Notes
+
+### Auto-Cycle Implementation
+
+The auto-cycle feature uses a layered architecture:
+
+1. **AutoCycleContext**: Global React context providing `isEnabled`, `enable()`, `disable()`, and `toggle()` methods
+2. **AutoCycleToggle**: Header button component that toggles the context state
+3. **AutoCycleOverlay**: Conditionally rendered overlay that:
+   - Wraps the entire app when auto-cycle is enabled
+   - Manages the `useAutoCycle` hook with navigation callback
+   - Handles keyboard shortcuts (Space, Arrows, Escape)
+   - Displays the AutoCycleControls panel
+4. **useAutoCycle Hook**: Core logic managing:
+   - Timer intervals for automatic advancement
+   - Progress tracking (0-100%)
+   - Phase/index state (globe datasets 0-2, molecules 0-3)
+   - Callback system for navigation events
+5. **URL Search Params**: Routes accept search parameters for external control:
+   - Globe route: `/?dataset=mountains|earthquakes|wildfires`
+   - Molecules route: `/molecules?molecule=water|glucose|dna|hemoglobin`
+
+This approach preserves all existing route UI (InfoPanel, ControlsPanel, MoleculeSelector) while adding presentation mode capability.
+
 ## Performance Notes
 
 - **60 FPS Target**: Optimized for live exhibit display
-- **Data Prefetching**: Auto-cycle mode prefetches all async data for seamless transitions
 - **Code Splitting**: Separate chunks for Three.js, Globe.gl, React, Mantine
 - **Lazy Loading**: Dataset APIs fetched on-demand when selected
 - **Sample Data Fallback**: Offline capability for internet failures at events
