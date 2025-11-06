@@ -1,4 +1,4 @@
-import { AppShell, Group, Tabs, Title } from "@mantine/core"
+import { Anchor, AppShell, Group, Stack, Tabs, Text, Title } from "@mantine/core"
 import { createRootRoute, Outlet, useLocation, useNavigate } from "@tanstack/react-router"
 import { TanStackRouterDevtools } from "@tanstack/router-devtools"
 
@@ -24,7 +24,32 @@ function RootComponent() {
       <AppShell header={{ height: 60 }} padding={0}>
         <AppShell.Header>
           <Group h="100%" px="md" justify="space-between">
-            <Title order={3}>DiscoverSTEM 2025 - Agentic AI Exhibit</Title>
+            <Group gap="lg" align="center">
+              <Title order={3}>DiscoverSTEM 2025 - Agentic AI Exhibit</Title>
+              <Anchor
+                href="https://sapientsai.com"
+                target="_blank"
+                underline="never"
+                style={{ display: "flex", alignItems: "center", gap: 6 }}
+              >
+                <Text size="xs" c="dimmed">
+                  Presented by
+                </Text>
+                <img
+                  src="https://sapientsai.com/images/logo.svg"
+                  alt="SapientsAI Logo"
+                  style={{ height: 20, width: 20 }}
+                />
+                <Text size="xs" fw={500}>
+                  <Text component="span" c="white" inherit>
+                    SAPIENTS
+                  </Text>
+                  <Text component="span" c="violet.5" inherit>
+                    AI
+                  </Text>
+                </Text>
+              </Anchor>
+            </Group>
 
             <Group gap="md">
               <Tabs value={activeTab} onChange={handleTabChange}>

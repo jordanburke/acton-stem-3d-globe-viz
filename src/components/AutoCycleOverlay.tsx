@@ -57,9 +57,10 @@ export function AutoCycleOverlay() {
     return () => window.removeEventListener("keydown", handleKeyPress)
   }, [isEnabled, controls, disable])
 
-  // Trigger initial navigation when auto-cycle is enabled
+  // Trigger initial navigation and start playing when auto-cycle is enabled
   useEffect(() => {
     if (isEnabled) {
+      controls.play() // Start the timer
       const dataset = getCurrentGlobeDataset(controls.state.globeIndex)
       navigate({ to: "/", search: { dataset } })
     }

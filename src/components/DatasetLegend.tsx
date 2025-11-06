@@ -44,14 +44,14 @@ const DATASET_INFO: Record<string, DatasetInfo> = {
   },
   wildfires: {
     title: "Wildfires",
-    description: "Active fires detected by NASA FIRMS satellite in the last 24 hours, colored by intensity.",
+    description: "Active fires (10+ MW) detected by NASA FIRMS satellite in the last 24 hours.",
     legend: [
       { color: "#ff0000", label: "1000+ MW (Extreme)" },
-      { color: "#ff2200", label: "500-1000 MW" },
-      { color: "#ff4400", label: "100-500 MW" },
-      { color: "#ff6600", label: "50-100 MW" },
-      { color: "#ff8800", label: "10-50 MW" },
-      { color: "#ffaa00", label: "<10 MW" },
+      { color: "#ff2200", label: "700-1000 MW" },
+      { color: "#ff4400", label: "500-700 MW" },
+      { color: "#ff6600", label: "300-500 MW" },
+      { color: "#ff8800", label: "200-300 MW" },
+      { color: "#ffaa00", label: "100-200 MW" },
     ],
   },
 }

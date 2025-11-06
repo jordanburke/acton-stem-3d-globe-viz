@@ -31,7 +31,7 @@ const MOLECULE_IDS = ["water", "glucose", "dna", "hemoglobin"] as const
 export function useAutoCycle(options: AutoCycleOptions = {}): AutoCycleControls {
   const { initialDuration = 10000, onPhaseChange } = options
   const [state, setState] = useState<AutoCycleState>({
-    isRunning: true,
+    isRunning: false,
     currentPhase: "globe",
     globeIndex: 0,
     moleculeIndex: 0,

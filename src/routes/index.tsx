@@ -15,7 +15,7 @@ function GlobeDemo() {
   const navigate = useNavigate()
   const searchParams = Route.useSearch()
   const [dataset, setDataset] = useState<string>(searchParams.dataset || "mountains")
-  const [rotationSpeed, setRotationSpeed] = useState<number>(0.5)
+  const [rotationSpeed, setRotationSpeed] = useState<number>(0.2)
   const [points, setPoints] = useState<GlobePoint[]>([])
   const [loading, setLoading] = useState<boolean>(false)
   const [stats, setStats] = useState<{
@@ -57,8 +57,16 @@ function GlobeDemo() {
       setLoading(true)
       try {
         const wildfireData = await fetchWildfireData()
-        const wildfirePoints = convertWildfiresToPoints(wildfireData)
-        const wildfireStats = getWildfireStats(wildfireData)
+        // Debug: Check FRP values
+        console.log(
+          "Sample FRP values:",
+          wildfireData.slice(0, 10).map((f) => ({ frp: f.frp, type: typeof f.frp })),
+        )
+        // Filter to only fires with FRP >= 10 MW for performance
+        const filteredData = wildfireData.filter((fire) => fire.frp >= 10)
+        console.log(`Filtered wildfires: ${wildfireData.length} → ${filteredData.length} (FRP >= 10 MW)`)
+        const wildfirePoints = convertWildfiresToPoints(filteredData)
+        const wildfireStats = getWildfireStats(filteredData)
 
         setPoints(wildfirePoints)
         setStats({

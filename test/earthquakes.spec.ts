@@ -104,11 +104,11 @@ describe("Earthquake Data Processing", () => {
   it("assigns correct colors based on magnitude", () => {
     const points = convertEarthquakesToPoints(mockEarthquakeData)
 
-    // 5.5 magnitude should be orange (#ff9800)
-    expect(points[0].color).toBe("#ff9800")
+    // 5.5 magnitude should be hot pink (#ff6b9d) - moderate intensity
+    expect(points[0].color).toBe("#ff6b9d")
 
-    // 3.2 magnitude should be yellow (#ffeb3b)
-    expect(points[1].color).toBe("#ffeb3b")
+    // 3.2 magnitude should be deep purple (#7e57c2) - minor intensity
+    expect(points[1].color).toBe("#7e57c2")
   })
 
   it("calculates earthquake statistics correctly", () => {

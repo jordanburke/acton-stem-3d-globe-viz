@@ -144,11 +144,12 @@ export async function fetchWildfireData(): Promise<WildfireData[]> {
 
 /**
  * Parses CSV data from NASA FIRMS
- * CSV Format: latitude,longitude,brightness,scan,track,acq_date,acq_time,satellite,confidence,version,bright_t31,frp,daynight
+ * CSV Format: latitude,longitude,bright_ti4,scan,track,acq_date,acq_time,satellite,instrument,confidence,version,bright_ti5,frp,daynight
  */
 function parseCSV(csvText: string): WildfireData[] {
   const lines = csvText.trim().split("\n")
   const headers = lines[0].split(",")
+  console.log("CSV Headers:", headers)
 
   return lines
     .slice(1) // Skip header row
@@ -164,11 +165,11 @@ function parseCSV(csvText: string): WildfireData[] {
         acq_date: values[5],
         acq_time: values[6],
         satellite: values[7],
-        confidence: parseFloat(values[8]),
-        version: values[9],
-        bright_t31: parseFloat(values[10]),
-        frp: parseFloat(values[11]),
-        daynight: values[12],
+        confidence: parseFloat(values[9]),
+        version: values[10],
+        bright_t31: parseFloat(values[11]),
+        frp: parseFloat(values[12]), // FRP is at index 12, not 11!
+        daynight: values[13],
       }
     })
     .filter((fire) => !isNaN(fire.latitude) && !isNaN(fire.longitude) && !isNaN(fire.frp))
@@ -177,14 +178,15 @@ function parseCSV(csvText: string): WildfireData[] {
 /**
  * Gets color based on fire radiative power (FRP)
  * Uses yellow → orange → red spectrum only
+ * Rescaled for 100+ MW fires
  */
 function getFireColor(frp: number): string {
   if (frp >= 1000) return "#ff0000" // Red - Extreme fire
-  if (frp >= 500) return "#ff2200" // Red-orange - Very high intensity
-  if (frp >= 100) return "#ff4400" // Orange-red - High intensity
-  if (frp >= 50) return "#ff6600" // Orange - Moderate intensity
-  if (frp >= 10) return "#ff8800" // Light orange - Low intensity
-  return "#ffaa00" // Yellow-orange - Very low intensity
+  if (frp >= 700) return "#ff2200" // Red-orange - Very high intensity
+  if (frp >= 500) return "#ff4400" // Orange-red - High intensity
+  if (frp >= 300) return "#ff6600" // Orange - High-moderate intensity
+  if (frp >= 200) return "#ff8800" // Light orange - Moderate intensity
+  return "#ffaa00" // Yellow-orange - 100-200 MW
 }
 
 /**
@@ -214,6 +216,7 @@ function createWildfireLabel(fire: WildfireData): string {
 
 /**
  * Converts wildfire data to globe points
+ * Note: Filtering should be done before calling this function
  */
 export function convertWildfiresToPoints(data: WildfireData[]): GlobePoint[] {
   return data

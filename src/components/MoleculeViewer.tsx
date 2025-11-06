@@ -117,6 +117,22 @@ function MoleculeStructure({ molecule }: { molecule: Molecule }) {
 }
 
 export function MoleculeViewer({ molecule, autoRotate = true }: MoleculeViewerProps) {
+  // Calculate molecule bounds to determine optimal camera distance
+  const cameraDistance = useMemo(() => {
+    if (molecule.atoms.length === 0) return 15
+
+    // Find the maximum distance from origin for any atom
+    let maxDistance = 0
+    for (const atom of molecule.atoms) {
+      const distance = Math.sqrt(atom.position[0] ** 2 + atom.position[1] ** 2 + atom.position[2] ** 2)
+      maxDistance = Math.max(maxDistance, distance + atom.radius)
+    }
+
+    // Camera should be far enough to see the entire molecule with some padding
+    // Use a multiplier to ensure the molecule fits comfortably in view
+    return Math.max(15, maxDistance * 2.5)
+  }, [molecule])
+
   return (
     <Canvas
       style={{ width: "100%", height: "100%", background: "#000000" }}
@@ -124,7 +140,7 @@ export function MoleculeViewer({ molecule, autoRotate = true }: MoleculeViewerPr
       aria-label={`3D molecular structure of ${molecule.name} - ${molecule.description}`}
     >
       {/* Camera */}
-      <PerspectiveCamera makeDefault position={[0, 0, 15]} />
+      <PerspectiveCamera makeDefault position={[0, 0, cameraDistance]} />
 
       {/* Lighting */}
       <ambientLight intensity={0.4} />
@@ -135,11 +151,11 @@ export function MoleculeViewer({ molecule, autoRotate = true }: MoleculeViewerPr
       {/* Controls */}
       <OrbitControls
         autoRotate={autoRotate}
-        autoRotateSpeed={1.5}
+        autoRotateSpeed={3.0}
         enableDamping
         dampingFactor={0.05}
         minDistance={5}
-        maxDistance={30}
+        maxDistance={Math.max(50, cameraDistance * 1.5)}
       />
 
       {/* Molecule */}
