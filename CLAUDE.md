@@ -4,141 +4,233 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a **3D Interactive Globe Data Visualization** project for an ACTON STEM educational exhibit. It demonstrates how AI can help build sophisticated 3D applications that would normally require weeks of development and specialized graphics expertise.
+This is a **multi-demo educational exhibit** for DiscoverSTEM 2025 showcasing AI-assisted development capabilities. The application includes two interactive 3D visualizations built with React and Three.js:
 
-**Purpose**: Create an interactive 3D Earth globe visualizing real global datasets (earthquakes, flights, climate data, wildfires) to showcase AI-assisted development capabilities to high school students.
+1. **3D Globe Visualization** - Interactive Earth globe displaying three real-world datasets:
+   - Mountains (14 highest peaks)
+   - Earthquakes (USGS real-time data, last 30 days)
+   - Wildfires (NASA FIRMS data, last 24 hours)
 
-**Build Target**: 3-4 hours with AI assistance vs. 1-2 weeks normally
+2. **Molecule Viewer** - 3D molecular structure visualization with four molecules:
+   - Water (H2O), Carbon Dioxide (CO2), DNA double helix, Hemoglobin protein
 
-**Tech Stack**: Three.js + Globe.gl library + public data APIs (USGS, NASA, OpenSky Network)
+**Purpose**: Demonstrate how AI can accelerate sophisticated 3D application development from weeks to hours, targeting high school students at STEM events.
 
-**Project Status**: Currently a TypeScript library template - needs to be adapted for the globe visualization application.
-
-## Documentation
-
-**Primary Guide**: `docs/3-globe-visualization-guide.md` - Complete step-by-step build instructions
-**Demo Context**: `docs/README.md` - Overview of the three demo projects (this is Demo #3)
+**Tech Stack**: React 19 + TypeScript + Vite + Three.js + Globe.gl + Mantine UI + TanStack Router
 
 ## Development Commands
 
-### Pre-Checkin Command
+### Primary Workflow
+- `pnpm validate` - **Main pre-commit command**: format, lint, test, and build everything
+- `pnpm dev` - Start development server (http://localhost:3000, auto-opens browser)
+- `pnpm build` - Production build to `dist/`
+- `pnpm preview` - Preview production build locally
 
-- `pnpm validate` - **Main command**: Format, lint, test, and build everything for checkin
-
-### Formatting
-
+### Code Quality
 - `pnpm format` - Format code with Prettier (write mode)
-- `pnpm format:check` - Check Prettier formatting without writing
-
-### Linting
-
+- `pnpm format:check` - Check formatting without writing
 - `pnpm lint` - Fix ESLint issues (write mode)
-- `pnpm lint:check` - Check ESLint issues without fixing
+- `pnpm lint:check` - Check ESLint without fixing
 
 ### Testing
-
-- `pnpm test` - Run tests once
+- `pnpm test` - Run tests once with Vitest
 - `pnpm test:watch` - Run tests in watch mode
-- `pnpm test:coverage` - Run tests with coverage report
+- `pnpm test:coverage` - Generate coverage report
 - `pnpm test:ui` - Launch Vitest UI for interactive testing
 
-### Building
-
-- `pnpm build` - Production build (outputs to `dist/`)
-- `pnpm build:watch` - Watch mode build
-- `pnpm dev` - Development build with watch mode (alias for build:watch)
-
 ### Type Checking
-
 - `pnpm ts-types` - Check TypeScript types with tsc
 
-## Architecture (Current Template State)
+## Architecture
+
+### Application Structure
+
+**Multi-Route Application** using TanStack Router (file-based routing):
+- `/` (index.tsx) - 3D Globe visualization demo
+- `/molecules` - Molecule viewer demo
+- `/dashboard` - Dashboard (placeholder)
+- `__root.tsx` - Root layout with AppShell and tab navigation
+
+**Key Components**:
+- Globe visualization (`src/components/Globe.tsx`) - Wrapper for GlobeRenderer
+- GlobeRenderer (`src/globe/GlobeRenderer.ts`) - Core Globe.gl integration class
+- MoleculeViewer (`src/components/MoleculeViewer.tsx`) - React Three Fiber 3D molecules
+- ControlsPanel, InfoPanel - Reusable UI controls for globe demo
+- MoleculeSelector, MoleculeInfo, AtomLegend - Molecule demo UI
+
+### Data Layer Architecture
+
+**Pattern**: Fetch → Convert → Stats
+Each dataset module (`src/data/*.ts`) exports three functions:
+1. `fetch*Data()` - Fetches/loads raw data (API or static)
+2. `convert*ToPoints()` - Transforms to `GlobePoint[]` for rendering
+3. `get*Stats()` - Computes statistics for InfoPanel
+
+**Available Datasets** (Globe visualization):
+- `mountains.ts` - Static data (14 highest peaks over 1000m)
+- `earthquakes.ts` - USGS API (real-time, last 30 days, no API key)
+- `wildfires.ts` - NASA FIRMS API (requires API key, last 24 hours)
+
+**Molecule Structures** (Molecule viewer):
+- `molecules.ts` - Static molecular structures (H2O, CO2, DNA helix, Hemoglobin)
+
+**Type Definitions** (`src/data/types.ts`):
+- `GlobePoint` - Standardized format for globe visualization
+- `EarthquakeData`, `EarthquakeFeature` - USGS GeoJSON types
+- `Molecule`, `Atom`, `Bond` - Molecular structure types
 
 ### Build System
 
-- **tsup**: Primary build tool configured in `tsup.config.ts`
-- **Dual Output Directories**:
-  - `lib/` - Development builds (NODE_ENV !== "production")
-  - `dist/` - Production builds (NODE_ENV === "production")
-- **Format Support**: Generates both CommonJS (`.js`) and ES modules (`.mjs`)
-- **Environment-Based Behavior** (tsup.config.ts:3):
-  - Production: minified, bundled, no watch
-  - Development: source maps, watch mode, faster builds
+**Vite Configuration** (`vite.config.ts`):
+- TanStack Router plugin with auto-generated route tree (`routeTree.gen.ts`)
+- React Babel plugin with experimental React Compiler
+- Path alias: `@` → `./src`
+- Dev server: Port 3000, auto-opens browser
+- Manual code splitting: three, globe, react, mantine chunks
+- Build output: `dist/` with sourcemaps
 
-### Testing Framework
+**Testing Framework** (`vitest.config.ts`):
+- Vitest with happy-dom environment
+- Coverage: v8 provider (text/json/html reports)
+- Globals enabled for test syntax
 
-- **Vitest**: Modern test runner with hot reload and coverage
-- **Configuration**: `vitest.config.ts` with Node.js environment
-- **Coverage**: Uses v8 provider with text/json/html reports
+### UI Framework
 
-### Code Quality Tools
+**Mantine v8** with dark theme (`src/main.tsx:33`):
+- Primary color: cyan
+- Default radius: md
+- AppShell layout for header + tab navigation
+- Component library: LoadingOverlay, Stack, Group, Tabs, Title, etc.
 
-- **ESLint**: Flat config setup in `eslint.config.mjs` with TypeScript support
-- **Prettier**: Integrated with ESLint for consistent formatting
-- **Import Sorting**: Automatic import organization via `simple-import-sort`
+**Three.js Integration**:
+- Globe demo: Imperative Globe.gl library in `GlobeRenderer` class
+- Molecule demo: Declarative React Three Fiber with `@react-three/drei`
 
-### TypeScript Configuration
+### Routing System
 
-- **Strict Mode**: Enabled with pragmatic exceptions:
-  - `noImplicitAny: false` - Allows implicit any for flexibility
-  - `strictPropertyInitialization: false` - Relaxed for constructor properties
-- **Target**: ESNext for modern JavaScript features
-- **Output**: TypeScript only emits declaration files; tsup handles transpilation
+**TanStack Router (Type-Safe)**:
+- File-based routes in `src/routes/`
+- Auto-generated route tree at build time (`routeTree.gen.ts`)
+- Router devtools included (dev mode only)
+- Routes registered in `main.tsx` with type safety
 
-## Implementation Plan (Per docs/3-globe-visualization-guide.md)
+## External Data Sources
 
-### Seven-Step Build Process
+### Mountains (No API Key)
+- **Source**: Static dataset in `mountains.ts`
+- **Data**: 14 highest mountain peaks with elevation and coordinates
+- **Visualization**: Blue gradient, size proportional to elevation above 1000m
+- **Peaks**: Everest, K2, Kangchenjunga, Lhotse, Makalu, Cho Oyu, etc.
 
-1. **Basic 3D Globe Setup** (30 min) - Three.js globe with rotation and controls
-2. **Add Earthquake Data** (45 min) - USGS API integration with magnitude-based visualization
-3. **Multiple Dataset Support** (60 min) - Flights, COVID, wildfires, meteors, cities
-4. **Time-Based Playback** (45 min) - Timeline controls and animation
-5. **Info Panels & Statistics** (30 min) - Data details and analytics
-6. **Custom Data Upload** (30 min) - CSV/GeoJSON file support
-7. **Polish & Advanced Features** (45 min) - Performance, accessibility, exports
+### Earthquakes (No API Key)
+- **Source**: USGS Earthquake Hazards Program
+- **URL**: `https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson`
+- **Format**: GeoJSON FeatureCollection
+- **Coverage**: Last 30 days, worldwide, real-time updates
+- **Visualization**: Color scale by magnitude (green→yellow→orange→red), exponential size
 
-**Total Build Time**: ~4 hours
+### Wildfires (API Key Required)
+- **Source**: NASA FIRMS (Fire Information for Resource Management System)
+- **API Key Setup**: Create `.env` with `VITE_NASA_FIRMS_API_KEY=your_key_here`
+- **Registration**: https://firms.modaps.eosdis.nasa.gov/api/area/
+- **Sensor**: VIIRS S-NPP (375m resolution)
+- **Coverage**: Last 24 hours, worldwide
+- **Fallback**: Sample data (5 demo fires) if no API key configured
+- **Visualization**: Color scale by FRP (gold→orange→red), logarithmic size
 
-### Key Data Sources
+### Molecules (No API Key)
+- **Source**: Static dataset in `molecules.ts`
+- **Data**: Atom positions, bonds, chemical properties
+- **Molecules**: Water (3 atoms), CO2 (3 atoms), DNA helix (simplified), Hemoglobin (simplified)
+- **Visualization**: Ball-and-stick model with CPK coloring, realistic Van der Waals radii
 
-**Free APIs (No Key)**:
+## Development Patterns
 
-- USGS Earthquakes: `https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson`
-- COVID-19: `https://disease.sh/v3/covid-19/countries`
+### Globe Visualization Flow
+1. User selects dataset in ControlsPanel → triggers `handleDatasetChange`
+2. `useEffect` watches dataset → calls `handleLoadData()`
+3. Data module fetches raw data → converts to `GlobePoint[]` → computes stats
+4. `setPoints()` updates Globe component → `GlobeRenderer.setPoints()` renders
+5. InfoPanel displays stats from `get*Stats()` functions
 
-**Free APIs (Key Required)**:
+### GlobeRenderer Lifecycle
+- **Creation**: Instantiated in Globe component's `useEffect` (mount)
+- **Configuration**: Globe.gl setup with Earth textures, camera, auto-rotation
+- **Updates**: `setPoints()`, `setRotationSpeed()`, `enableAutoRotate()`
+- **Cleanup**: `destroy()` removes event listeners and clears container
 
-- OpenSky Network: Flight data (400 credits/day free tier)
-- NASA FIRMS: Wildfire data (free API key)
+### React Three Fiber Pattern (Molecules)
+- **Canvas**: Top-level R3F component wrapping 3D scene
+- **Declarative Mesh**: `<mesh>` → `<sphereGeometry>` → `<meshStandardMaterial>`
+- **Controls**: `<OrbitControls autoRotate={autoRotate} />`
+- **Camera**: `<PerspectiveCamera position={[0, 0, 15]} />`
+- **Lighting**: Ambient + directional lights for realistic rendering
 
-**Static Datasets**: World cities, historical events, UNESCO sites (CSV format)
+## Key Implementation Details
 
-## Project Adaptation Requirements
+### Globe Texture URLs (GlobeRenderer.ts:20-22)
+Uses unpkg.com CDN for Three.js globe assets:
+- `earth-blue-marble.jpg` - NASA Blue Marble surface texture
+- `earth-topology.png` - Bump map for terrain relief
+- `night-sky.png` - Background starfield
 
-This repository currently contains the TypeScript library template structure. To build the globe visualization:
+### Point Visualization (GlobeRenderer.ts:47-55)
+All datasets use bar visualization with:
+- `pointAltitude="size"` - Height represents magnitude/intensity
+- `pointColor="color"` - Dataset-specific color scales
+- `pointRadius=0.08` - Fixed radius for consistency
+- `pointLabel` - Hover tooltips with data details
 
-1. **Decide on architecture**: Standalone web app vs. reusable library component
-2. **Add dependencies**: Three.js, Globe.gl, data processing libraries
-3. **Update build configuration**: May need HTML/CSS bundling for web app
-4. **Create visualization modules**: Globe renderer, data fetchers, UI components
-5. **Add example datasets**: Sample CSV files for demo purposes
-6. **Configure deployment**: GitHub Pages or similar static hosting
+### Molecule Rendering (MoleculeViewer.tsx)
+- **Atoms**: Spheres with element-specific colors and Van der Waals radii
+- **Bonds**: Cylinders between atoms, positioned/rotated via quaternion math
+- **Simplified Mode**: Larger atoms with emissive glow for educational clarity
+- **Bond Orders**: Single (0.08 radius), double (2 parallel cylinders), triple (3 parallel)
 
-## Deployment Strategy
+### Code Splitting Strategy (vite.config.ts:25-30)
+Manual chunks to optimize loading:
+- `three` chunk - Three.js library (~500KB)
+- `globe` chunk - Globe.gl library
+- `react` chunk - React + ReactDOM
+- `mantine` chunk - Mantine UI components
 
-**Recommended**: GitHub Pages for simple static hosting
+## Environment Variables
 
-- Fast CDN delivery
-- Easy updates via git push
-- Custom domain support
-- No server-side logic needed (all APIs are client-side)
+**NASA FIRMS API Key** (optional):
+```env
+VITE_NASA_FIRMS_API_KEY=your_api_key_here
+```
 
-**Alternative**: Vercel/Netlify for serverless functions if needed for API key security
+**Vite Environment Variables**:
+- Prefix: `VITE_` required for client-side access
+- Access: `import.meta.env.VITE_NASA_FIRMS_API_KEY`
+- Location: `.env` file in project root (gitignored)
 
-## Key Constraints
+## Performance Considerations
 
-- **Build in hours, not weeks**: Leverage AI to handle complex 3D graphics code
-- **Educational focus**: Code should be understandable to high school students
-- **Demo-ready**: Must run smoothly at live exhibit (60fps target)
-- **Offline fallback**: Hardcoded sample data in case of internet failure at event
-- **Professional quality**: Comparable to news organization data visualizations
+- **60 FPS Target**: Optimized for live exhibit display
+- **Lazy Loading**: Dataset APIs fetched on-demand when selected
+- **Code Splitting**: Separate chunks for Three.js, Globe.gl, React, Mantine
+- **Sample Data Fallback**: Offline capability for internet failures at events
+- **Resize Handling**: Globe automatically adapts to window size changes
+
+## Documentation
+
+- `docs/3-globe-visualization-guide.md` - Step-by-step build guide (original plan)
+- `docs/README.md` - Demo project overview
+- `README.md` - User-facing setup and usage guide
+
+## Known Patterns
+
+### Adding New Datasets
+1. Create `src/data/[dataset].ts` with fetch/convert/stats functions
+2. Import functions in `src/routes/index.tsx`
+3. Add case to `handleLoadData()` switch statement
+4. Add option to ControlsPanel dataset Select component
+5. Update InfoPanel to handle dataset-specific stat labels
+
+### Adding New Routes
+1. Create `src/routes/[name].tsx` with component and `createFileRoute`
+2. TanStack Router plugin auto-generates route in `routeTree.gen.ts`
+3. Add tab to `__root.tsx` AppShell header Tabs component
+4. Router automatically handles navigation and type safety

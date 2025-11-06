@@ -1,14 +1,24 @@
-# 3D Globe Data Visualization - ACTON STEM
+# 3D Interactive Visualizations - DiscoverSTEM 2025
 
-An interactive 3D Earth globe visualizing real-world datasets including earthquakes and wildfires. Built for ACTON STEM educational exhibit to showcase AI-assisted development.
+A multi-demo educational exhibit featuring two interactive 3D visualizations: an Earth globe displaying real-world datasets (mountains, earthquakes, wildfires) and a molecular structure viewer. Built for DiscoverSTEM 2025 to showcase AI-assisted development capabilities.
 
 ## Features
 
+### 3D Globe Visualization
 - **Interactive 3D Globe**: Rotate and zoom with mouse/touch controls
-- **Real-time Earthquake Data**: USGS data for the last 30 days with magnitude-based visualization
-- **Wildfire Detection**: NASA FIRMS satellite fire data with Fire Radiative Power (FRP) metrics
+- **Multiple Datasets**:
+  - **Mountains**: 14 highest peaks over 1000m with elevation visualization
+  - **Earthquakes**: Real-time USGS data for the last 30 days with magnitude-based visualization
+  - **Wildfires**: NASA FIRMS satellite fire data with Fire Radiative Power (FRP) metrics
 - **Dynamic Statistics**: Live stats panel showing dataset metrics
 - **Responsive Controls**: Dataset selection and rotation speed adjustment
+
+### 3D Molecule Viewer
+- **Interactive Molecular Structures**: View water, CO2, DNA, and protein molecules in 3D
+- **Realistic Rendering**: Atoms with accurate colors and Van der Waals radii
+- **Bond Visualization**: Single, double, and triple bonds with proper geometry
+- **Auto-Rotation**: Toggle automatic rotation for better viewing
+- **Atom Legend**: Color-coded guide for chemical elements
 
 ## Quick Start
 
@@ -73,14 +83,22 @@ The app will automatically use sample wildfire data (5 demo fires) if no API key
 
 ## Tech Stack
 
-- **React 18** - UI framework
-- **Mantine UI 7** - Component library with dark theme
-- **Three.js** - 3D graphics engine
-- **Globe.gl** - 3D globe visualization
-- **Vite** - Build tool and dev server
+- **React 19** - UI framework with React Compiler
 - **TypeScript** - Type-safe development
+- **Vite** - Build tool and dev server
+- **TanStack Router** - Type-safe file-based routing
+- **Mantine UI v8** - Component library with dark theme
+- **Three.js** - 3D graphics engine
+- **Globe.gl** - 3D globe visualization (imperative API)
+- **React Three Fiber** - Declarative Three.js for molecule viewer
 
 ## Data Sources
+
+### Mountains (No API Key Required)
+
+- **Source**: Static dataset of 14 highest peaks
+- **Data**: Peak name, elevation, coordinates
+- **Visualization**: Height proportional to elevation above 1000m
 
 ### Earthquakes (No API Key Required)
 
@@ -88,6 +106,7 @@ The app will automatically use sample wildfire data (5 demo fires) if no API key
 - **API**: https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.geojson
 - **Coverage**: Last 30 days, worldwide
 - **Update Frequency**: Real-time (updates every minute)
+- **Visualization**: Color and size based on magnitude
 
 ### Wildfires (API Key Required)
 
@@ -95,26 +114,53 @@ The app will automatically use sample wildfire data (5 demo fires) if no API key
 - **Sensor**: VIIRS S-NPP (375m resolution)
 - **Coverage**: Last 24 hours, worldwide
 - **Update Frequency**: Near real-time (every 3-5 hours)
+- **Visualization**: Color and size based on Fire Radiative Power (FRP)
+
+### Molecules (No API Key Required)
+
+- **Source**: Static molecular structure data
+- **Molecules**: Water (H2O), Carbon Dioxide (CO2), DNA helix, Hemoglobin protein
+- **Data**: Atom positions, bonds, chemical properties
+- **Visualization**: Ball-and-stick model with realistic colors
 
 ## Project Structure
 
 ```
 src/
-├── components/          # React components
-│   ├── Globe.tsx       # Globe wrapper component
-│   ├── ControlsPanel.tsx # Dataset and rotation controls
-│   └── InfoPanel.tsx   # Statistics display
-├── data/               # Data fetching and processing
-│   ├── earthquakes.ts  # USGS earthquake data
-│   ├── wildfires.ts    # NASA FIRMS wildfire data
-│   └── types.ts        # Shared TypeScript types
-├── globe/              # Globe rendering logic
-│   └── GlobeRenderer.ts # Three.js globe setup
-├── App.tsx             # Main application component
-└── main.tsx            # Application entry point
+├── routes/                  # TanStack Router file-based routes
+│   ├── __root.tsx          # Root layout with AppShell and tabs
+│   ├── index.tsx           # Globe visualization (home route)
+│   ├── molecules.tsx       # Molecule viewer route
+│   └── dashboard.tsx       # Dashboard route (placeholder)
+├── components/              # React components
+│   ├── Globe.tsx           # Globe wrapper component
+│   ├── ControlsPanel.tsx   # Dataset and rotation controls
+│   ├── InfoPanel.tsx       # Statistics display
+│   ├── MoleculeViewer.tsx  # React Three Fiber molecule renderer
+│   ├── MoleculeSelector.tsx # Molecule selection UI
+│   ├── MoleculeInfo.tsx    # Molecule details panel
+│   └── AtomLegend.tsx      # Chemical element legend
+├── data/                    # Data fetching and processing
+│   ├── earthquakes.ts      # USGS earthquake data
+│   ├── wildfires.ts        # NASA FIRMS wildfire data
+│   ├── mountains.ts        # Static mountain peaks data
+│   ├── cities.ts           # Static world cities data
+│   ├── molecules.ts        # Molecular structure definitions
+│   └── types.ts            # Shared TypeScript types
+├── globe/                   # Globe rendering logic
+│   └── GlobeRenderer.ts    # Globe.gl setup and management
+├── main.tsx                 # Application entry point
+└── routeTree.gen.ts        # Auto-generated route tree
 ```
 
 ## Visualization Details
+
+### Mountains
+
+- **Color**: Blue gradient based on elevation
+- **Size**: Proportional to elevation above 1000m
+- **Data Points**: 14 highest peaks (Everest, K2, Kangchenjunga, etc.)
+- **Tooltips**: Peak name, elevation, coordinates
 
 ### Earthquakes
 
@@ -129,6 +175,13 @@ src/
 - **Size**: Logarithmically scaled by Fire Radiative Power
 - **Data Points**: Active fires detected in last 24 hours
 - **Tooltips**: FRP, brightness, confidence, satellite, day/night detection
+
+### Molecules
+
+- **Rendering**: Ball-and-stick model with realistic atom sizes
+- **Colors**: CPK coloring (H=white, C=gray, N=blue, O=red, etc.)
+- **Bonds**: Cylinders connecting atoms (single/double/triple bonds)
+- **Molecules**: Water, CO2, DNA double helix, Hemoglobin protein
 
 ## Browser Support
 
