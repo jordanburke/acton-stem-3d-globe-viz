@@ -1,6 +1,7 @@
 import { ActionIcon, Group, Paper, Progress, Slider, Stack, Text, Title } from "@mantine/core"
 import { IconPlayerPause, IconPlayerPlay, IconPlayerSkipBack, IconPlayerSkipForward } from "@tabler/icons-react"
 
+import { useAutoCycleContext } from "../contexts/AutoCycleContext"
 import type { AutoCycleControls as AutoCycleControlsType } from "../hooks/useAutoCycle"
 import { getCurrentGlobeDataset, getCurrentMoleculeId } from "../hooks/useAutoCycle"
 
@@ -10,6 +11,7 @@ interface AutoCycleControlsProps {
 
 export function AutoCycleControls({ controls }: AutoCycleControlsProps) {
   const { state, play, pause, skipForward, skipBackward, setDuration } = controls
+  const { setDuration: setContextDuration } = useAutoCycleContext()
 
   const getCurrentViewName = (): string => {
     if (state.currentPhase === "globe") {
@@ -28,7 +30,9 @@ export function AutoCycleControls({ controls }: AutoCycleControlsProps) {
   }
 
   const handleDurationChange = (value: number): void => {
-    setDuration(value * 1000) // Convert seconds to milliseconds
+    const milliseconds = value * 1000
+    setDuration(milliseconds) // Update hook state
+    setContextDuration(milliseconds) // Update context for next time
   }
 
   return (

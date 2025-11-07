@@ -6,11 +6,11 @@ import { getCurrentGlobeDataset, getCurrentMoleculeId, useAutoCycle } from "../h
 import { AutoCycleControls } from "./AutoCycleControls"
 
 export function AutoCycleOverlay() {
-  const { isEnabled, disable } = useAutoCycleContext()
+  const { isEnabled, duration, disable } = useAutoCycleContext()
   const navigate = useNavigate()
 
   const controls = useAutoCycle({
-    initialDuration: 10000,
+    initialDuration: duration,
     onPhaseChange: (phase, index) => {
       if (phase === "globe") {
         const dataset = getCurrentGlobeDataset(index)
@@ -58,11 +58,17 @@ export function AutoCycleOverlay() {
   }, [isEnabled, controls, disable])
 
   // Trigger initial navigation and start playing when auto-cycle is enabled
+  // Reset and cleanup when auto-cycle is disabled
   useEffect(() => {
     if (isEnabled) {
+      controls.reset() // Start fresh from beginning
       controls.play() // Start the timer
-      const dataset = getCurrentGlobeDataset(controls.state.globeIndex)
+      const dataset = getCurrentGlobeDataset(0) // Always start at first dataset
       navigate({ to: "/", search: { dataset } })
+    } else {
+      // Clean up when disabled - stop timers and reset state
+      controls.pause()
+      controls.reset()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isEnabled])

@@ -18,6 +18,7 @@ export interface AutoCycleControls {
   skipForward: () => void
   skipBackward: () => void
   setDuration: (duration: number) => void
+  reset: () => void
 }
 
 export interface AutoCycleOptions {
@@ -139,6 +140,29 @@ export function useAutoCycle(options: AutoCycleOptions = {}): AutoCycleControls 
     startTimeRef.current = Date.now()
   }
 
+  const reset = (): void => {
+    // Clear any active intervals
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current)
+      intervalRef.current = null
+    }
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current)
+      progressIntervalRef.current = null
+    }
+
+    // Reset to initial state
+    setState({
+      isRunning: false,
+      currentPhase: "globe",
+      globeIndex: 0,
+      moleculeIndex: 0,
+      duration: initialDuration,
+      progress: 0,
+    })
+    startTimeRef.current = Date.now()
+  }
+
   // Main cycle timer
   useEffect(() => {
     if (state.isRunning) {
@@ -179,6 +203,7 @@ export function useAutoCycle(options: AutoCycleOptions = {}): AutoCycleControls 
     skipForward,
     skipBackward,
     setDuration,
+    reset,
   }
 }
 
